@@ -34,6 +34,13 @@ export class OrdersController {
       return this.ordersService.placeOrderTopic(order);
     }
   }
+  @Post('place-order-fanout')
+  placeOrderFanout(@Body() order: OrderDto) {
+    if (!order || !order.productName) {
+      throw new Error('Invalid order data');
+    }
+    return this.ordersService.placeOrderFanout(order);
+  }
 
   @Get()
   getOrders() {

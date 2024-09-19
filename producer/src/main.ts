@@ -18,17 +18,31 @@ async function bootstrap() {
   
   ///// Topic Exchange 
 
-  const topicExchange = 'topic_exchange';
-  const topicExchangeType = 'topic';
-  const topicQueue = 'topic_queue';
-  const topicRoutingKey = 'order.*'; // Example pattern to match
+  // const topicExchange = 'topic_exchange';
+  // const topicExchangeType = 'topic';
+  // const topicQueue = 'topic_queue';
+  // const topicRoutingKey = 'order.*'; // Example pattern to match
   
-  await channel.assertExchange(topicExchange, topicExchangeType, { durable: true });
-  const q = await channel.assertQueue(topicQueue, { durable: true });
-  console.log(`Waiting for messages in queue: ${q.queue}`)
-  await channel.bindQueue(topicQueue, topicExchange, topicRoutingKey);
+  // await channel.assertExchange(topicExchange, topicExchangeType, { durable: true });
+  // const q = await channel.assertQueue(topicQueue, { durable: true });
+  // console.log(`Waiting for messages in queue: ${q.queue}`)
+  // await channel.bindQueue(topicQueue, topicExchange, topicRoutingKey);
+  const fanoutExchange = 'fanout_exchange';
+  const fanoutExchangeType = 'fanout';
 
-  
+  // Assert the fanout exchange
+  await channel.assertExchange(fanoutExchange, fanoutExchangeType, { durable: true });
+
+  // First queue bound to the fanout exchange
+  const fanoutQueue1 = 'fanout_queue1';
+  await channel.assertQueue(fanoutQueue1, { durable: true });
+  await channel.bindQueue(fanoutQueue1, fanoutExchange, '');
+
+  // Second queue bound to the fanout exchange
+  const fanoutQueue2 = 'fanout_queue2';
+  await channel.assertQueue(fanoutQueue2, { durable: true });
+  await channel.bindQueue(fanoutQueue2, fanoutExchange, '');
+
   await app.listen(3000);
 }
 bootstrap();
