@@ -28,17 +28,18 @@ export class AppController {
     console.log('Recieved topic order: ', order);
     return this.appService.handleTopicOrder(order, context);
   }
-  // @EventPattern('') // Empty pattern for fanout
-  // handleFanoutQueue(@Payload() order: OrderDto, @Ctx() context: RmqContext) {
-  //   this.appService.handleFanoutQueue(order, context);
-  // }
-
-  @MessagePattern()
-  handleFanout(@Payload() order: any, @Ctx() context: RmqContext) {
-    console.log('Message received from fanout_queue1 and 2:');
-    const orderdto = msgpack.decode(order) as OrderDto;
-    return this.appService.handleFanoutQueue(orderdto,context);
+  @MessagePattern({ headers: { 'x-match': 'all', header1: 'logged_in', header2: 'authorized' } })
+  handleHeaderExchangeQueue(@Payload() order: any, @Ctx() context: RmqContext) {
+    console.log('Received message from header exchange queue:');
+    const orderDto = msgpack.decode(order) as OrderDto;
+    return this.appService.handleHeaderQueue(orderDto, context);
   }
+  @MessagePattern()
+    handleFanout(@Payload() order: any, @Ctx() context: RmqContext) {
+      console.log('Message received from fanout_queue1 and 2:');
+      const orderdto = msgpack.decode(order) as OrderDto;
+      return this.appService.handleFanoutQueue(orderdto,context);
+    }
   @MessagePattern({ cmd: 'fetch-orders' })
   getOrders(@Ctx() context: RmqContext) {
     console.log(context.getMessage());

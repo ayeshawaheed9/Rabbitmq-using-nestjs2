@@ -41,6 +41,14 @@ export class OrdersController {
     }
     return this.ordersService.placeOrderFanout(order);
   }
+  @Post('place-order-header')
+  placeOrderHeader(@Body() order: OrderDto){
+    if (!order || !order.productName) {
+      throw new Error('Invalid order data');
+    }
+    return this.ordersService.placeOrderHeader(order);
+  }
+
 
   @Get()
   getOrders() {

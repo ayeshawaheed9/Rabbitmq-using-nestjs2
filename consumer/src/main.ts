@@ -1,49 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-
+import { rmqConfig } from './rmq.config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  // Microservice for orders-queue
-  // Microservice for fanout_queue1
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: ['amqp://localhost:5672'],
-      queue: 'fanout_queue1',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  });
-
-  // Microservice for fanout_queue2
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: ['amqp://localhost:5672'],
-      queue: 'fanout_queue2',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  });
-  
-  // app.connectMicroservice<MicroserviceOptions>({
-  //   transport: Transport.RMQ,
-  //   options: {
-  //     urls: ['amqp://localhost:5672'],
-  //     queue: 'fanout_queue2', // Listen to the second queue
-  //     queueOptions: {
-  //       durable: true,
-  //     },
-  //   },
-  // });
+  app.connectMicroservice(rmqConfig('fanout_queue1'));  // Fanout Queue 1
+  app.connectMicroservice(rmqConfig('fanout_queue2'));  // Fanout Queue 2
+  app.connectMicroservice(rmqConfig('header_queue'));   // Header Queue
   await app.startAllMicroservices();
 }
-
 bootstrap();
+
 // import { NestFactory } from '@nestjs/core';
 // import { AppModule } from './app.module';
 // import { MicroserviceOptions, Transport } from '@nestjs/microservices';

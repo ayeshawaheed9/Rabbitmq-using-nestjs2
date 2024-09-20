@@ -46,7 +46,16 @@ export class AppService {
     channel.ack(originalMessage);
     console.log(`Fanout queue order accepted, Email: ${order.email}`);
   }
-
+  handleHeaderQueue(order: OrderDto,context:RmqContext){
+    const channel = context.getChannelRef();
+    const originalMessage = context.getMessage();
+    if (!order || !order.productName) {
+      throw new Error('Invalid order data');
+    }
+    this.orders.push(order);
+    channel.ack(originalMessage);
+    console.log(`Header queue order accepted, Email: ${order.email}`);
+  }
   getOrders() {
     return this.orders;
   }
